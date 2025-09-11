@@ -1,0 +1,215 @@
+@use './variable' as v;
+
+$pc: 1440px;
+$table: 768px;
+$mobile: 480px;
+
+/* ========================================== RESET */
+body {
+  color: v.$text;
+  font-family: var(--font-pretendard), sans-serif;
+  font-size: 1.5rem;
+  overflow-x: hidden;
+  line-height: 1;
+
+  &.modal-open {
+    overflow: hidden;
+  }
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+hr {
+  display: none;
+}
+
+h1 {
+  margin: 0;
+}
+
+a {
+  color: v.$text;
+  text-decoration: none;
+}
+
+b {
+  font-weight: 400;
+}
+
+button {
+  color: v.$text;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+img {
+  border: none;
+  -webkit-user-drag: none;
+}
+
+html {
+  font-size: 0.625em;
+}
+
+.clear:after {
+  content: "";
+  clear: both;
+  display: block;
+}
+
+.blind {
+  overflow: hidden;
+  white-space: nowrap;
+  clip: rect(1px, 1px, 1px, 1px);
+  -webkit-clip-path: inset(50%);
+  clip-path: inset(50%);
+  position: absolute;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+input,
+textarea,
+select,
+button {
+  font-family: 'Pretendard', sans-serif;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+table {
+  width: 100%;
+  border-spacing: 0;
+  table-layout: fixed;
+}
+
+caption,
+figcaption {
+  visibility: hidden;
+  overflow: hidden;
+  width: 0;
+  height: 0;
+  font-size: 0;
+  line-height: 0
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #b0b0b0;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+}
+
+img.--full {
+  width: 100%;
+}
+
+.pc {
+  display: none;
+}
+
+// wmde-markdown
+.wmde-markdown {
+  font-family: var(--font-pretendard), sans-serif !important;
+
+  ol, ul {
+    padding-left: 1.2em !important;
+    list-style: initial;
+  }
+
+  ol {
+    list-style: auto;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    padding-bottom: 0 !important;
+    margin-top: 3.6rem !important;
+    border: none  !important;
+  }
+
+  blockquote {
+    padding: 0.6rem 1em !important;
+
+    &.orange {
+      border-left-color: #F2762E;
+      background: #fcf3ee;
+    }
+
+    &.til {
+      .que {
+        &::after {
+          display: inline-block;
+          content: '🤔 문제';
+          padding: 0.2rem 0.8rem;
+          margin-bottom: 0.8rem;
+          color: #fff;
+          font-weight: 700;
+          border-radius: 0.5rem;
+        }
+      }
+    }
+
+    span {
+      display: inline-block;
+      padding: 1.1rem;
+      margin-right: 0.5rem;
+      border-radius: 1rem;
+      background: rgba(255, 255, 255, .5);
+      line-height: 1;
+    }
+  }
+}
+
+// dark mode
+body[data-color-mode="dark"] {
+  color: #fff;
+  transition: color .3s;
+
+  .wmde-markdown {
+    blockquote {
+
+      &.orange {
+        border-left-color: #F2762E;
+        background: #2c2c2c;
+      }
+
+      span {
+        background: rgba(255, 255, 255, .2);
+      }
+    }
+  }
+}
+
+// mobile
+@media screen and (max-width: $table) {
+  .pc {
+    display: none;
+  }
+  .mobile {
+    display: block;
+  }
+}
