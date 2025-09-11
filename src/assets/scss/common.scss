@@ -6,11 +6,12 @@ $mobile: 480px;
 
 /* ========================================== RESET */
 body {
-  color: v.$text;
+  color: v.$color-text;
   font-family: var(--font-pretendard), sans-serif;
   font-size: 1.5rem;
   overflow-x: hidden;
   line-height: 1;
+  background: v.$color-bg;
 
   &.modal-open {
     overflow: hidden;
@@ -37,7 +38,7 @@ h1 {
 }
 
 a {
-  color: v.$text;
+  color: v.$color-text;
   text-decoration: none;
 }
 
@@ -46,7 +47,7 @@ b {
 }
 
 button {
-  color: v.$text;
+  color: v.$color-text;
   border: none;
   background: none;
   cursor: pointer;
@@ -89,6 +90,7 @@ button {
   font-family: 'Pretendard', sans-serif;
   appearance: none;
   -webkit-appearance: none;
+  background: v.$color-input-bg;
 }
 
 table {
