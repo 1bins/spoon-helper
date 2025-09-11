@@ -1,5 +1,8 @@
+'use client';
+
 import styles from './button.module.scss';
 import classnames from 'classnames/bind';
+import {forwardRef} from "react";
 
 const cx = classnames.bind(styles);
 
@@ -11,16 +14,20 @@ interface ButtonProps extends NativeButtonProps {
   round?: boolean;
 }
 
-const Button = ({
-  type = 'button',
-  className,
-  children,
-  onClick,
-  icon,
-  iconOnly = false,
-  round = false,
-  ...rest
-}: ButtonProps) => {
+const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+  (
+    {
+      type = 'button',
+      className,
+      children,
+      icon,
+      onClick,
+      iconOnly = false,
+      round = false,
+      ...rest
+    },
+    ref
+  ) => {
   return(
     <button
       type={type}
@@ -35,6 +42,6 @@ const Button = ({
       {children}
     </button>
   )
-}
+});
 
 export default Button;
