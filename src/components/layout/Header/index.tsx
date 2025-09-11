@@ -16,7 +16,7 @@ interface MenuItemProps {
   active?: boolean;
 }
 
-export const H1 = () => {
+const H1 = () => {
   return(
     <h1 className={cx('logo')}>
       <Link
@@ -34,7 +34,7 @@ export const H1 = () => {
   )
 }
 
-export const MenuItem = ({
+const MenuItem = ({
   icon,
   url,
   active
