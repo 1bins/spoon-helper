@@ -1,16 +1,14 @@
 import styles from './box.module.scss';
 import classnames from 'classnames/bind';
+import {FlexProps as BaseFlexProps} from "@/types";
 
 const cx = classnames.bind(styles);
 
-interface BoxProps {
+interface BoxProps extends BaseFlexProps {
   className?: string;
   as?: React.ElementType;
   title?: string;
   children: React.ReactNode;
-  flexDirection?: 'column' | 'row';
-  justifyCenter?: boolean;
-  alignCenter?: boolean;
 }
 
 const Box = ({
@@ -25,7 +23,7 @@ const Box = ({
   return(
     <Component
       className={cx('container',
-        flexDirection !== 'row',
+        flexDirection === 'row' && 'row',
         {justifyCenter, alignCenter},
         className
       )}

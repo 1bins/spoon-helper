@@ -1,15 +1,13 @@
 import styles from './card.module.scss';
 import classnames from 'classnames/bind';
+import {FlexProps as BaseFlexProps} from "@/types";
 
 const cx = classnames.bind(styles);
 
-interface CardProps {
+interface CardProps extends BaseFlexProps {
   className?: string;
   as?: React.ElementType;
   children: React.ReactNode;
-  flexDirection?: 'column' | 'row';
-  justifyCenter?: boolean;
-  alignCenter?: boolean;
 }
 
 const Box = ({
@@ -23,7 +21,7 @@ const Box = ({
   return(
     <Component
       className={cx('card',
-        flexDirection !== 'row',
+        flexDirection === 'row' && 'row',
         {justifyCenter, alignCenter},
         className
       )}
