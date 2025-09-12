@@ -12,12 +12,16 @@ interface CustomDatePickerProps {
   placeholder?: string;
   value?: null | Date;
   onChange?: (value: null | Date) => void;
+  minDate?: Date;
+  maxDate?: Date;
 }
 
 const CustomDatePicker = ({
   placeholder,
   value,
   onChange,
+  minDate,
+  maxDate
 }: CustomDatePickerProps) => {
 
   return(
@@ -32,7 +36,8 @@ const CustomDatePicker = ({
         showIcon
         toggleCalendarOnIconClick
         icon={<FcCalendar size={16} />}
-        maxDate={new Date()}
+        minDate={minDate}
+        maxDate={maxDate}
       />
     </div>
   )
