@@ -130,3 +130,93 @@ input[type="checkbox"] {
 img.--full {
   width: 100%;
 }
+
+// calendar customize
+main {
+  .react-datepicker {
+    border: none;
+    padding: 1.5rem;
+    box-shadow: 0 0 0.6rem 0.05rem rgba(0, 0, 0, .15);
+
+    // calendar navigation
+    &__navigation {
+      top: 1.8rem;
+
+      $navPosition: 4.2rem;
+      &--previous {
+        left: $navPosition;
+      }
+
+      &--next {
+        right: $navPosition;
+      }
+    }
+
+    // calendar header
+    &__header {
+      background: none;
+      border-bottom: none;
+    }
+
+    &__current-month {
+      font-size: 1.5rem;
+    }
+
+    // calendaer body
+    &__month {
+      margin: 0.8rem 0;
+    }
+
+    &__day {
+      @mixin CalendarDay {
+        width: 3.7rem;
+        height: 3.7rem;
+        line-height: 3.5rem;
+        font-size: 1.5rem;
+        border-radius: 0.6rem !important;
+        outline: none;
+      }
+      @include CalendarDay;
+
+      &-name {
+        @include CalendarDay;
+        font-size: 1.4rem;
+        font-weight: 700;
+      }
+
+      // 오늘 일자 노출
+      &--keyboard-selected {
+        background: #eee;
+      }
+
+      // 지난/다음 달 일자 노출
+      &--outside-month {
+        color: #ccc;
+      }
+    }
+
+    // calendar icon
+    &__input-container {
+      .react-datepicker__calendar-icon {
+        padding: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        right: 2.3rem;
+        cursor: pointer;
+        width: 2rem;
+        height: 2rem;
+      }
+    }
+  }
+
+  // color set
+  .react-datepicker__day--selected:not([aria-disabled=true]):hover, .react-datepicker__day--in-selecting-range:not([aria-disabled=true]):hover, .react-datepicker__day--in-range:not([aria-disabled=true]):hover, .react-datepicker__month-text--selected:not([aria-disabled=true]):hover, .react-datepicker__month-text--in-selecting-range:not([aria-disabled=true]):hover, .react-datepicker__month-text--in-range:not([aria-disabled=true]):hover, .react-datepicker__quarter-text--selected:not([aria-disabled=true]):hover, .react-datepicker__quarter-text--in-selecting-range:not([aria-disabled=true]):hover, .react-datepicker__quarter-text--in-range:not([aria-disabled=true]):hover, .react-datepicker__year-text--selected:not([aria-disabled=true]):hover, .react-datepicker__year-text--in-selecting-range:not([aria-disabled=true]):hover, .react-datepicker__year-text--in-range:not([aria-disabled=true]):hover {
+    background: v.$color-primary;
+  }
+  .react-datepicker__day--selected, .react-datepicker__day--in-selecting-range, .react-datepicker__day--in-range, .react-datepicker__month-text--selected, .react-datepicker__month-text--in-selecting-range, .react-datepicker__month-text--in-range, .react-datepicker__quarter-text--selected, .react-datepicker__quarter-text--in-selecting-range, .react-datepicker__quarter-text--in-range, .react-datepicker__year-text--selected, .react-datepicker__year-text--in-selecting-range, .react-datepicker__year-text--in-range {
+    background: v.$color-primary;
+  }
+  .react-datepicker__day--keyboard-selected:not([aria-disabled=true]):hover, .react-datepicker__month-text--keyboard-selected:not([aria-disabled=true]):hover, .react-datepicker__quarter-text--keyboard-selected:not([aria-disabled=true]):hover, .react-datepicker__year-text--keyboard-selected:not([aria-disabled=true]):hover {
+    background: v.$color-primary;
+  }
+}
