@@ -4,6 +4,33 @@
   height: 4.6rem;
 
   .icon-box {
-    line-height: 1;
+    line-height: 0;
+  }
+
+  &.select {
+    $paddingLR: 2.3rem;
+
+    position: relative;
+    border-radius: 2.3rem;
+    text-align: left;
+    padding: 0 $paddingLR;
+    
+    .icon-box {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      right: $paddingLR;
+      transition: transform .3s;
+
+      svg {
+        fill: #555;
+      }
+    }
+
+    &.active {
+      .icon-box {
+        transform: translateY(-50%) rotate(180deg);
+      }
+    }
   }
 }

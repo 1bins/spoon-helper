@@ -12,6 +12,7 @@ interface ButtonProps extends NativeButtonProps {
   icon?: React.ReactNode;
   iconOnly?: boolean;
   round?: boolean;
+  active?: boolean;
 }
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -24,6 +25,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       onClick,
       iconOnly = false,
       round = false,
+      active,
       ...rest
     },
     ref
@@ -32,7 +34,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     <button
       type={type}
       className={cx('button',
-        {round, iconOnly},
+        {round, iconOnly, active},
         className
       )}
       onClick={onClick}
