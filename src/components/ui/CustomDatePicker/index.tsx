@@ -32,6 +32,7 @@ const CustomDatePicker = ({
         showIcon
         toggleCalendarOnIconClick
         icon={<FcCalendar size={16} />}
+        maxDate={new Date()}
       />
     </div>
   )
