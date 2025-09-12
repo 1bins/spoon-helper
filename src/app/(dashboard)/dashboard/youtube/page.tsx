@@ -20,11 +20,43 @@ const FormField = () => {
     {label: '롱폼', value: 'long'},
   ]
 
-  const [value, setValue] = useState('');
+  const [url, setUrl] = useState<string>('');
+  const [option, setOption] = useState<string>('');
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
 
-  // TODO:: 종료일이 시작일보다 이전일 수 없게
+  // 검색 기능
+  const handleSubmit = () => {
+    const isValidUrl = url && url.length >= 3 && ['@', 'user/', 'channel/'].some(keyword => url.includes(keyword));
+
+    if (!isValidUrl) {
+      alert('정확한 채널 주소를 입력해주세요 \n예) @스푼, user/spoon, channel/spoon');
+      return;
+    }
+
+    if (option === '') {
+      alert('영상 구분 옵션을 선택해주세요');
+      return;
+    }
+
+    if (!startDate) {
+      alert('업로드 기간 시작일을 설정해주세요');
+      return;
+    }
+
+    if (!endDate) {
+      alert('업로드 기간 종료일이 지정되지 않아 오늘 기준으로 자동 설정합니다');
+      setEndDate(new Date());
+      return;
+    }
+
+    if (startDate > endDate) {
+      alert('업로드 기간 시작일이 종료일보다 클 수 없습니다');
+      return;
+    }
+
+    console.log(url, option, startDate, endDate);
+  }
   // TODO:: 시작일 설정 시 종료일 시작일+3개월 넘길 수 없게
 
   return(
@@ -34,13 +66,15 @@ const FormField = () => {
       <div className={cx('form-box', 'upper')}>
         <Input
           className={cx('input', 'input-address')}
-          placeholder={"youtube.com/ 뒤의 주소를 입력해주세요 (예: @스푼 또는 user/spoon 또는 channel/123123)"}
+          value={url}
+          onChange={setUrl}
+          placeholder={"youtube.com/ 뒤의 주소를 입력해주세요 (예: @스푼 또는 user/spoon 또는 channel/spoon)"}
         />
         <Select
           options={options}
           placeholder={"영상 구분"}
-          value={value}
-          onChange={setValue}
+          value={option}
+          onChange={setOption}
         />
       </div>
       <div className={cx('form-box', 'lower')}>
@@ -48,15 +82,18 @@ const FormField = () => {
           placeholder={"업로드 기간 시작일"}
           value={startDate}
           onChange={setStartDate}
+          maxDate={endDate || new Date()}
         />
         <CustomDatePicker
           placeholder={"업로드 기간 종료일"}
           value={endDate}
           onChange={setEndDate}
+          {...(startDate && { minDate: startDate })}
+          maxDate={new Date()}
         />
         <Button
           className={cx('btn-search')}
-          onClick={() => console.log('클릭')}
+          onClick={() => handleSubmit()}
           round
           >검색하기</Button>
       </div>
