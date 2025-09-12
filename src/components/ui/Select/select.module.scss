@@ -1,0 +1,33 @@
+.container {
+  position: relative;
+  width: 26.3rem;
+
+  button {
+    width: 100%;
+
+    .placeholder {
+      color: #999;
+    }
+  }
+
+  .option-list {
+    position: absolute;
+    width: 100%;
+    bottom: -1rem;
+    transform: translateY(100%);
+    padding: 1.2rem 0;
+    background: #fff;
+    border-radius: 1.3rem;
+    box-shadow: 0 0 0.6rem 0.05rem rgba(0, 0, 0, .05);
+
+    li {
+      padding: 1.2rem 2.3rem;
+      cursor: pointer;
+      border-radius: 1.3rem;
+      
+      &:hover {
+        background: #f8f8f8;
+      }
+    }
+  }
+}
