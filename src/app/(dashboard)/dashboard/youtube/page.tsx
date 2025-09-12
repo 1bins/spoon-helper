@@ -10,6 +10,7 @@ import {useState} from "react";
 import CustomDatePicker from "@/components/ui/CustomDatePicker";
 import Button from "@/components/ui/Button";
 import Link from "next/link";
+import { addMonths, min } from "date-fns";
 
 const cx = classnames.bind(styles);
 
@@ -82,6 +83,7 @@ const FormField = () => {
           placeholder={"업로드 기간 시작일"}
           value={startDate}
           onChange={setStartDate}
+          {...(endDate && { minDate: addMonths(endDate, -3) })}
           maxDate={endDate || new Date()}
         />
         <CustomDatePicker
@@ -89,7 +91,7 @@ const FormField = () => {
           value={endDate}
           onChange={setEndDate}
           {...(startDate && { minDate: startDate })}
-          maxDate={new Date()}
+          maxDate={startDate ? min([addMonths(startDate, 3), new Date()]) : new Date()}
         />
         <Button
           className={cx('btn-search')}
