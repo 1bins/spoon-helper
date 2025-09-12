@@ -76,7 +76,7 @@ const Select = ({
         icon={<IoMdArrowDropdownCircle size={17} />}
         active={isOpen}
       >
-        {value || <span className={cx('placeholder')}>{placeholder}</span>}
+        {options.find((opt) => opt.value === value)?.label || <span className={cx('placeholder')}>{placeholder}</span>}
       </Button>
 
       {isOpen && (
@@ -90,7 +90,7 @@ const Select = ({
               <li
                 key={`option-${idx}`}
                 role={"option"}
-                onClick={() => handleClickOption(option.label)}
+                onClick={() => handleClickOption(option.value)}
               >
                 {option.label}
               </li>
