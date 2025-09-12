@@ -8,9 +8,10 @@ const cx = classnames.bind(styles);
 
 type NativeInputProps = React.InputHTMLAttributes<HTMLInputElement>;
 
-export interface InputProps extends Omit<NativeInputProps, 'type'> {
+export interface InputProps extends Omit<NativeInputProps, 'type' | 'onChange'> {
   type?: 'text' | 'password' | 'number';
   label?: string;
+  onChange?: (value: string) => void;
 }
 
 const Input = ({
@@ -38,7 +39,7 @@ const Input = ({
         'input',
         className,
       )}
-      onChange={onChange}
+      onChange={(e) => onChange?.(e.target.value)}
       onKeyDown={onKeyDown}
       disabled={disabled}
       {...rest}
