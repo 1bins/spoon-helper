@@ -32,6 +32,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ) => {
   return(
     <button
+      ref={ref}
       type={type}
       className={cx('button',
         {round, iconOnly, active},
@@ -45,5 +46,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     </button>
   )
 });
+
+Button.displayName = 'Button';
 
 export default Button;
