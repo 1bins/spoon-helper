@@ -27,17 +27,28 @@ type RowItem = {
   isShort: boolean;
 };
 
+type ReportStats = {
+  totalVideos: number;
+  sumViews: number;
+  sumLikes: number;
+  sumComments: number;
+  avgViews: number;
+  avgLikes: number;
+  avgComments: number;
+};
+
 const useKRFmt = () => {
   const dateFmt = useMemo(
     () => new Intl.DateTimeFormat('ko-KR', { year: 'numeric', month: 'numeric', day: 'numeric' }),
     []
   );
   const timeFmt = useMemo(
-    () => new Intl.DateTimeFormat('ko-KR', { hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false }),
+    () => new Intl.DateTimeFormat('ko-KR', { hour: 'numeric', minute: 'numeric', hour12: false }),
     []
   );
   const numFmt = useMemo(() => new Intl.NumberFormat('ko-KR'), []);
-  return { dateFmt, timeFmt, numFmt };
+  const numFmtPoint = useMemo(() => new Intl.NumberFormat('ko-KR', { maximumFractionDigits: 1 }), []);
+  return { dateFmt, timeFmt, numFmt, numFmtPoint };
 };
 
 /** ── FormField ─────────────────────────── */
@@ -182,10 +193,79 @@ const TableField = ({ rows }: { rows: RowItem[] }) => {
   );
 };
 
+const TableReport = ({ stats }: { stats: ReportStats }) => {
+  const { numFmt, numFmtPoint } = useKRFmt();
+  const {
+      totalVideos, sumViews, sumLikes, sumComments,
+      avgViews, avgLikes, avgComments
+  } = stats;
+
+  return(
+    <Card className={cx('report-wrp')}>
+      <div className={cx('title-box')}>
+        <p>종합 결과 리포트</p>
+      </div>
+      <div className={cx('list-box')}>
+        <dl className={cx('--mb')}>
+          <dt>총 영상 수</dt>
+          <dd>{numFmt.format(totalVideos)}</dd>
+        </dl>
+
+        <dl>
+          <dt>총 조회 수</dt>
+          <dd>{numFmt.format(sumViews)}</dd>
+        </dl>
+        <dl>
+          <dt>총 좋아요 수</dt>
+          <dd>{numFmt.format(sumLikes)}</dd>
+        </dl>
+        <dl className={cx('--mb')}>
+          <dt>총 댓글 수</dt>
+          <dd>{numFmt.format(sumComments)}</dd>
+        </dl>
+
+        <dl>
+          <dt>조회 수 평균</dt>
+          <dd>{numFmtPoint.format(avgViews)}</dd>
+        </dl>
+        <dl>
+          <dt>좋아요 수 평균</dt>
+          <dd>{numFmtPoint.format(avgLikes)}</dd>
+        </dl>
+        <dl>
+          <dt>댓글 수 평균</dt>
+          <dd>{numFmtPoint.format(avgComments)}</dd>
+        </dl>
+      </div>
+    </Card>
+  )
+}
+
 /** ── Page (실제 API 호출 붙이기) ─────────────────────────── */
 export default function Page() {
   const [rows, setRows] = useState<RowItem[]>([]);
   const [loading, setLoading] = useState(false);
+
+  const stats = useMemo<ReportStats>(() => {
+    const total = rows.length;
+    let sumViews = 0, sumLikes = 0, sumComments = 0;
+
+    for (const r of rows) {
+      sumViews += Number(r.viewCount ?? 0);
+      sumLikes += Number(r.likeCount ?? 0);
+      sumComments += Number(r.commentCount ?? 0);
+    }
+
+    return {
+      totalVideos: total,
+      sumViews,
+      sumLikes,
+      sumComments,
+      avgViews: total ? sumViews / total : 0,
+      avgLikes: total ? sumLikes / total : 0,
+      avgComments: total ? sumComments / total : 0,
+    };
+  }, [rows]);
 
   const handleSearch = async ({
     input, start, end, option
@@ -247,9 +327,6 @@ export default function Page() {
         return true; // 'all'
       });
 
-      console.log('[videos] total:', data3.total);
-      console.log('[videos] first 3:', data3.items.slice(0, 3));
-
       setRows(
         filtered.map(v => ({
           videoId: v.videoId,
@@ -263,6 +340,7 @@ export default function Page() {
           isShort: v.isShort,
         }))
       );
+
     } catch (e) {
       console.error(e);
       setRows([]);
@@ -274,8 +352,13 @@ export default function Page() {
   return (
     <Box title="유튜브 채널 검색" className={cx('container')}>
       <FormField onSearch={handleSearch} />
-      {loading && <Loader />}
-      {!loading && <TableField rows={rows} />}
+      <Card className={cx('flex-box')} flexDirection={"row"}>
+        <Card className={cx('table-box')}>
+          {loading && <Loader />}
+          {!loading && <TableField rows={rows} />}
+        </Card>
+        {!loading && <TableReport stats={stats} />}
+      </Card>
     </Box>
   );
 }
