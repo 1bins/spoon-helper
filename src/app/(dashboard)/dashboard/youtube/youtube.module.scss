@@ -28,6 +28,8 @@
 
   .table-wrp {
     padding-top: 0;
+    max-height: 62.71lvh;
+    overflow-y: auto;
 
     table {
       width: 100rem;
