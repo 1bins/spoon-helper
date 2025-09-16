@@ -136,7 +136,12 @@ const TableItem = ({ row, index }: { row: RowItem; index: number }) => {
       <td>{index + 1}</td>
       <td>
         <div className={cx('img-box')}>
-          {row.thumbnail ? <img src={row.thumbnail} alt={row.title} /> : '-'}
+          {row.thumbnail ?
+            <a href={row.thumbnail} download={`${row.videoId}.jpg`} target={"_blank"}>
+              <img src={row.thumbnail} alt={row.title} />
+            </a>
+            : '-'
+          }
         </div>
       </td>
       <td>

@@ -97,6 +97,8 @@ export async function fetchVideosDetails(videoIds: string[]): Promise<VideoDetai
           title?: string;
           publishedAt?: string;
           thumbnails?: {
+            maxres?: { url?: string };
+            standard?: { url?: string };
             high?: { url?: string };
             medium?: { url?: string };
             default?: { url?: string };
@@ -123,6 +125,8 @@ export async function fetchVideosDetails(videoIds: string[]): Promise<VideoDetai
       const isShortByDuration = durationSec > 0 ? durationSec < 180 : false;
 
       const thumb =
+        it.snippet?.thumbnails?.maxres?.url ||
+        it.snippet?.thumbnails?.standard?.url ||
         it.snippet?.thumbnails?.high?.url ||
         it.snippet?.thumbnails?.medium?.url ||
         it.snippet?.thumbnails?.default?.url ||
