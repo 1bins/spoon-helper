@@ -11,7 +11,7 @@ import { useCallback, useMemo, useState } from "react";
 import CustomDatePicker from "@/components/ui/CustomDatePicker";
 import Button from "@/components/ui/Button";
 import Link from "next/link";
-import { addMonths, min } from "date-fns";
+import { addMonths, min, startOfDay, endOfDay } from "date-fns";
 
 const cx = classnames.bind(styles);
 
@@ -92,6 +92,14 @@ const FormField = ({ onSearch }: { onSearch: (params: { input: string; start: Da
     }
   }
 
+  const handleStartDate = (date: Date | null) => {
+    setStartDate(date ? startOfDay(date) : null);   // 00:00:00
+  };
+
+  const handleEndDate = (date: Date | null) => {
+    setEndDate(date ? endOfDay(date) : null);       // 23:59:59.999
+  };
+
   return (
     <Card className={cx('form-wrp')}>
       <div className={cx('form-box', 'upper')}>
@@ -108,14 +116,14 @@ const FormField = ({ onSearch }: { onSearch: (params: { input: string; start: Da
         <CustomDatePicker
           placeholder="업로드 기간 시작일"
           value={startDate}
-          onChange={setStartDate}
+          onChange={handleStartDate}
           {...(endDate && { minDate: addMonths(endDate, -3) })}
           maxDate={endDate || new Date()}
         />
         <CustomDatePicker
           placeholder="업로드 기간 종료일"
           value={endDate}
-          onChange={setEndDate}
+          onChange={handleEndDate}
           {...(startDate && { minDate: startDate })}
           maxDate={startDate ? min([addMonths(startDate, 3), new Date()]) : new Date()}
         />
