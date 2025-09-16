@@ -105,6 +105,15 @@
 
           .date {
             font-size: 1.4rem;
+
+            span {
+              display: block;
+            }
+          }
+
+          &:nth-last-child(-n+3) {
+            font-size: 1.4rem;
+            padding: 0;
           }
         }
 
