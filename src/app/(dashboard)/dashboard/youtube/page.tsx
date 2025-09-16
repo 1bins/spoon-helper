@@ -7,7 +7,7 @@ import Card from "@/components/ui/Card";
 import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
 import Loader from "@/components/ui/Loader";
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import CustomDatePicker from "@/components/ui/CustomDatePicker";
 import Button from "@/components/ui/Button";
 import Link from "next/link";
@@ -27,6 +27,19 @@ type RowItem = {
   isShort: boolean;
 };
 
+const useKRFmt = () => {
+  const dateFmt = useMemo(
+    () => new Intl.DateTimeFormat('ko-KR', { year: 'numeric', month: 'numeric', day: 'numeric' }),
+    []
+  );
+  const timeFmt = useMemo(
+    () => new Intl.DateTimeFormat('ko-KR', { hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false }),
+    []
+  );
+  const numFmt = useMemo(() => new Intl.NumberFormat('ko-KR'), []);
+  return { dateFmt, timeFmt, numFmt };
+};
+
 /** ── FormField ─────────────────────────── */
 const FormField = ({ onSearch }: { onSearch: (params: { input: string; start: Date; end: Date; option: string }) => void }) => {
   const options = [
@@ -36,18 +49,15 @@ const FormField = ({ onSearch }: { onSearch: (params: { input: string; start: Da
   ];
 
   const [url, setUrl] = useState('');
-  const [option, setOption] = useState('');
+  const [option, setOption] = useState('all');
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
 
-  const handleSubmit = () => {
+  const handleSubmit = useCallback(() => {
     if (!url || !['@', 'user/', 'channel/'].some(k => url.includes(k))) {
+      // TODO: alert → 토스트로 전환 (UX), 비동기 로깅(Sentry)도 고려
       alert('정확한 채널 주소를 입력해주세요 \n예) @스푼, user/spoon, channel/spoon');
       return;
-    }
-    if (!option) {
-      alert('영상 구분 옵션을 지정하지 않아 [전체]로 자동 설정됩니다');
-      setOption('all');
     }
     if (!startDate) {
       alert('업로드 기간 시작일을 설정해주세요');
@@ -62,8 +72,8 @@ const FormField = ({ onSearch }: { onSearch: (params: { input: string; start: Da
       return;
     }
 
-    onSearch({ input: url, start: startDate, end: endDate, option });
-  };
+    onSearch({ input: url, start: startDate, end: endDate, option: option || 'all' });
+  }, [url, option, startDate, endDate, onSearch]);
 
   const inputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
@@ -108,6 +118,8 @@ const FormField = ({ onSearch }: { onSearch: (params: { input: string; start: Da
 
 /** ── TableItem (rows 1개씩) ─────────────────────────── */
 const TableItem = ({ row, index }: { row: RowItem; index: number }) => {
+  const { dateFmt, timeFmt, numFmt } = useKRFmt();
+
   return (
     <tr>
       <td>{index + 1}</td>
@@ -128,13 +140,13 @@ const TableItem = ({ row, index }: { row: RowItem; index: number }) => {
       </td>
       <td>
         <p className={cx('date')}>
-          <span>{new Date(row.publishedAt).toLocaleDateString("ko-KR", {year: "numeric", month: "numeric", day: "numeric"})}</span>
-          <span>{new Date(row.publishedAt).toLocaleTimeString("ko-KR", {hour: "numeric", minute: "numeric", second: "numeric", hour12: false})}</span>
+          <span>{dateFmt.format(new Date(row.publishedAt))}</span>
+          <span>{timeFmt.format(new Date(row.publishedAt))}</span>
         </p>
       </td>
-      <td>{row.viewCount.toLocaleString()}</td>
-      <td>{row.likeCount.toLocaleString()}</td>
-      <td>{row.commentCount.toLocaleString()}</td>
+      <td>{numFmt.format(row.viewCount)}</td>
+      <td>{numFmt.format(row.likeCount)}</td>
+      <td>{numFmt.format(row.commentCount)}</td>
     </tr>
   );
 };
