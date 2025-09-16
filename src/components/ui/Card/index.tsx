@@ -10,7 +10,7 @@ interface CardProps extends BaseFlexProps {
   children: React.ReactNode;
 }
 
-const Box = ({
+const Card = ({
   className,
   as: Component = 'div',
   children,
@@ -31,4 +31,4 @@ const Box = ({
   )
 }
 
-export default Box;
+export default Card;
