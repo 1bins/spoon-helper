@@ -1,12 +1,13 @@
 'use client';
 
-import styles from './header.module.scss';
-import classnames from 'classnames/bind';
-import {usePathname, useRouter} from "next/navigation";
 import Button from "@/components/ui/Button";
-import {menu} from "@/config/menu";
+import { useToast } from "@/components/ui/Toast/useToast";
+import { menu } from "@/config/menu";
+import classnames from 'classnames/bind';
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import styles from './header.module.scss';
 
 const cx = classnames.bind(styles);
 
@@ -39,7 +40,7 @@ const MenuItem = ({
   url,
   active
 }: MenuItemProps) => {
-  const router = useRouter();
+  const { toastShow: ts } = useToast();
 
   if (!url) {
     return(
@@ -47,7 +48,7 @@ const MenuItem = ({
         <Button
           iconOnly={true}
           icon={icon}
-          onClick={() => alert('현재 페이지 준비중입니다')} // TODO:: toast 설정
+          onClick={() => ts({type: 'info', message: '현재 페이지 준비중입니다'})}
           className={cx('menu-item')}
         />
       </li>

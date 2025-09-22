@@ -1,17 +1,18 @@
 'use client';
 
-import styles from './youtube.module.scss';
-import classnames from 'classnames/bind';
 import Box from "@/components/ui/Box";
-import Card from "@/components/ui/Card";
-import Input from "@/components/ui/Input";
-import Select from "@/components/ui/Select";
-import Loader from "@/components/ui/Loader";
-import { useCallback, useMemo, useState } from "react";
-import CustomDatePicker from "@/components/ui/CustomDatePicker";
 import Button from "@/components/ui/Button";
+import Card from "@/components/ui/Card";
+import CustomDatePicker from "@/components/ui/CustomDatePicker";
+import Input from "@/components/ui/Input";
+import Loader from "@/components/ui/Loader";
+import Select from "@/components/ui/Select";
+import { useToast } from '@/components/ui/Toast/useToast';
+import classnames from 'classnames/bind';
+import { addMonths, endOfDay, min, startOfDay } from "date-fns";
 import Link from "next/link";
-import { addMonths, min, startOfDay, endOfDay } from "date-fns";
+import { useCallback, useMemo, useState } from "react";
+import styles from './youtube.module.scss';
 
 const cx = classnames.bind(styles);
 
@@ -53,6 +54,8 @@ const useKRFmt = () => {
 
 /** ── FormField ─────────────────────────── */
 const FormField = ({ onSearch }: { onSearch: (params: { input: string; start: Date; end: Date; option: string }) => void }) => {
+  const { toastShow: ts } = useToast();
+
   const options = [
     { label: '전체', value: 'all' },
     { label: '숏폼', value: 'short' },
@@ -66,20 +69,35 @@ const FormField = ({ onSearch }: { onSearch: (params: { input: string; start: Da
 
   const handleSubmit = useCallback(() => {
     if (!url || !['@', 'user/', 'channel/'].some(k => url.includes(k))) {
-      // TODO: alert → 토스트로 전환 (UX), 비동기 로깅(Sentry)도 고려
-      alert('정확한 채널 주소를 입력해주세요 \n예) @스푼, user/spoon, channel/spoon');
+      ts({
+        type: 'warn',
+        title: '정확한 채널 주소를 입력해주세요',
+        message: '예) @스푼, user/spoon, channel/spoon'
+      });
       return;
     }
     if (!startDate) {
-      alert('업로드 기간 시작일을 설정해주세요');
+      ts({
+        type: 'warn',
+        title: '업로드 기간 시작일 오류',
+        message: '업로드 기간 시작일을 설정해주세요'
+      });
       return;
     }
     if (!endDate) {
-      alert('업로드 기간 종료일을 지정해주세요');
+      ts({
+        type: 'warn',
+        title: '업로드 기간 종료일 오류',
+        message: '업로드 기간 종료일을 설정해주세요'
+      });
       return;
     }
     if (startDate > endDate) {
-      alert('시작일이 종료일보다 클 수 없습니다');
+      ts({
+        type: 'warn',
+        title: '업로드 기간 지정 오류',
+        message: '시작일이 종료일보다 클 수 없습니다'
+      });
       return;
     }
 
@@ -258,6 +276,7 @@ const TableReport = ({ stats }: { stats: ReportStats }) => {
 export default function Page() {
   const [rows, setRows] = useState<RowItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const { toastShow: ts } = useToast();
 
   const stats = useMemo<ReportStats>(() => {
     const total = rows.length;
@@ -294,7 +313,7 @@ export default function Page() {
       const resolveQs = new URLSearchParams({ input }).toString();
       const res1 = await fetch(`/api/youtube/channelId?${resolveQs}`);
       const data1 = await res1.json();
-      if (!res1.ok) throw new Error(data1.error || 'resolve 실패');
+      if (!res1.ok) throw res1;
 
       // 2) 기간 내 업로드 영상 리스트
       const listQs = new URLSearchParams({
@@ -304,8 +323,18 @@ export default function Page() {
       }).toString();
       const res2 = await fetch(`/api/youtube/list?${listQs}`);
       const data2 = await res2.json();
-      if (!res2.ok) throw new Error(data2.error || 'list API 실패');
-      // data2.items = [{ videoId, publishedAt }, ...]
+      if (!res2.ok) throw res2;
+
+      if (!Array.isArray(data2.items) || data2.items.length === 0) {
+        setRows([]);
+        ts({
+          type: 'info',
+          title: '검색 결과 없음',
+          message: '해당 기간에 업로드된 영상이 없습니다'
+        });
+        setLoading(false);
+        return;
+      }
 
       const videoIds: string[] = data2.items.map((it: { videoId: string }) => it.videoId);
 
@@ -331,7 +360,7 @@ export default function Page() {
         error?: string;
       } = await res3.json();
 
-      if (!res3.ok) throw new Error(data3.error || 'videos API 실패');
+      if (!res3.ok) throw res3;
 
       // ▶ 옵션 필터 적용 (클라이언트)
       const filtered = data3.items.filter((v: { isShort: boolean }) => {
@@ -355,7 +384,49 @@ export default function Page() {
       );
 
     } catch (e) {
-      console.error(e);
+      if (e instanceof Response) {
+        const status = e.status;
+
+        switch (status) {
+          case 404:
+            ts({
+              title: '채널 주소 오류',
+              message: '입력한 채널 주소를 확인해주세요'
+            });
+            break;
+
+          case 400:
+            ts({
+              title: '요청 오류',
+              message: '요청 파라미터를 확인해주세요'
+            });
+            break;
+
+          case 429:
+          case 403:
+            ts({
+              title: '요청 제한 또는 권한 오류',
+              message: '잠시 후 다시 시도하거나 관리자에게 문의해주세요',
+              duration: 5000,
+            });
+            break;
+
+          case 500:
+            ts({
+              title: '서버 통신 오류(API)',
+              message: '서버 오류가 발생했습니다. 담당자에게 연락 바랍니다.',
+              duration: 5000,
+            });
+            break;
+
+          default:
+            ts({
+              title: '요청 실패',
+              message: '잠시 후 다시 시도해주세요'
+            });
+            break;
+        }
+      }
       setRows([]);
     } finally {
       setLoading(false);
