@@ -53,7 +53,7 @@ const useKRFmt = () => {
 };
 
 /** ── FormField ─────────────────────────── */
-const FormField = ({ onSearch }: { onSearch: (params: { input: string; start: Date; end: Date; option: string }) => void }) => {
+const FormField = ({ onSearch, loading }: { onSearch: (params: { input: string; start: Date; end: Date; option: string }) => void, loading: boolean; }) => {
   const { toastShow: ts } = useToast();
 
   const options = [
@@ -145,7 +145,11 @@ const FormField = ({ onSearch }: { onSearch: (params: { input: string; start: Da
           {...(startDate && { minDate: startDate })}
           maxDate={startDate ? min([addMonths(startDate, 3), new Date()]) : new Date()}
         />
-        <Button className={cx('btn-search')} onClick={handleSubmit} round>
+        <Button
+          className={cx('btn-search')}
+          onClick={handleSubmit}
+          round
+          disabled={loading}>
           검색하기
         </Button>
       </div>
@@ -435,7 +439,7 @@ export default function Page() {
 
   return (
     <Box title="유튜브 채널 검색" className={cx('container')}>
-      <FormField onSearch={handleSearch} />
+      <FormField onSearch={handleSearch} loading={loading} />
       <Card className={cx('flex-box')} flexDirection={"row"}>
         <Card className={cx('table-box')}>
           {loading && <Loader />}

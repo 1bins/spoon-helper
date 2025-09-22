@@ -3,6 +3,10 @@
 .button {
   height: 4.6rem;
 
+  &:disabled {
+    filter: grayscale(1);
+  }
+
   .icon-box {
     line-height: 0;
   }
