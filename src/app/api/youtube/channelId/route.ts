@@ -32,11 +32,26 @@ export async function GET(req: Request) {
       const qs = new URLSearchParams({ key: process.env.YOUTUBE_API_KEY!, part: 'id', forHandle: value });
       const res = await fetch(`${BASE}/channels?${qs.toString()}`, { cache: 'no-store' });
       const data = await res.json();
+
+      if (!res.ok) {
+        return NextResponse.json(
+          { error: data?.error?.message || 'YouTube API 실패', raw: data },
+          { status: res.status }
+        );
+      }
       channelId = data?.items?.[0]?.id || '';
+
     } else if (type === 'user') {
       const qs = new URLSearchParams({ key: process.env.YOUTUBE_API_KEY!, part: 'id', forUsername: value });
       const res = await fetch(`${BASE}/channels?${qs.toString()}`, { cache: 'no-store' });
       const data = await res.json();
+
+      if (!res.ok) {
+        return NextResponse.json(
+          { error: data?.error?.message || 'YouTube API 실패', raw: data },
+          { status: res.status }
+        );
+      }
       channelId = data?.items?.[0]?.id || '';
     }
 
