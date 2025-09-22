@@ -8,6 +8,7 @@ import { PiSmileyFill } from "react-icons/pi";
 import Button from '../Button';
 import styles from './toast.module.scss';
 import { Toast, ToastType } from './ToastContext';
+import { motion } from 'motion/react';
 
 const cx = classnames.bind(styles);
 
@@ -74,10 +75,14 @@ const ToastItem = ({
   }
 
   return(
-    <div
+    <motion.div
       className={cx('toast', type)}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
+
+      initial={{ opacity: 0, y: 10,  scale: 0.9, rotateX: 12, transformPerspective: 600, filter: 'blur(1px)' }}
+      animate={{ opacity: 1, y: 0,  scale: 1, rotateX: 0, filter: 'blur(0px)', transition: { duration: 0.62, ease: [0.2, 0.8, 0.2, 1] } }}
+      exit={{ opacity: 0, y: -180, rotateX: 5, scale: 0.96, filter: 'blur(1px)', transition: { duration: 0.25, ease: [0.4, 0, 1, 1] } }}
     >
       <div className={cx('icon-box')}>
         {getIconType(type)}
@@ -103,7 +108,7 @@ const ToastItem = ({
             ></span>
         </div>
       )}
-    </div>
+    </motion.div>
   )
 }
 

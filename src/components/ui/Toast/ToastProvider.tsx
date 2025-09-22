@@ -5,6 +5,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { Toast, ToastContext } from './ToastContext';
 import ToastItem from './index';
 import styles from './toast.module.scss';
+import { AnimatePresence } from 'motion/react';
 
 const cx = classnames.bind(styles);
 
@@ -48,17 +49,19 @@ export const ToastProvider = ({
       {children}
 
       <div className={cx('container')}>
-        {toasts.map(t => (
-        <ToastItem
-          key={t.id}
-          id={t.id}
-          type={t.type}
-          title={t.title}
-          message={t.message}
-          duration={t.duration}
-          onClose={dismiss}
-        />
-      ))}
+        <AnimatePresence>
+          {toasts.map(t => (
+            <ToastItem
+              key={t.id}
+              id={t.id}
+              type={t.type}
+              title={t.title}
+              message={t.message}
+              duration={t.duration}
+              onClose={dismiss}
+            />
+          ))}
+        </AnimatePresence>
       </div>
     </ToastContext.Provider>
   )
