@@ -1,3 +1,4 @@
+import { ToastProvider } from "@/components/ui/Toast/ToastProvider";
 import type { Metadata } from "next";
 import localFont from 'next/font/local';
 import "./globals.scss";
@@ -22,7 +23,9 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className={pretendard.variable}>
-        {children}
+        <ToastProvider>
+          {children}
+        </ToastProvider>
       </body>
     </html>
   );
