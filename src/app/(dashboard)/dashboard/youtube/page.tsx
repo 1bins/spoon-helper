@@ -11,7 +11,7 @@ import { useToast } from '@/components/ui/Toast/useToast';
 import classnames from 'classnames/bind';
 import { addMonths, endOfDay, min, startOfDay } from "date-fns";
 import Link from "next/link";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import styles from './youtube.module.scss';
 
 const cx = classnames.bind(styles);
@@ -102,7 +102,7 @@ const FormField = ({ onSearch, loading }: { onSearch: (params: { input: string; 
     }
 
     onSearch({ input: url, start: startDate, end: endDate, option: option || 'all' });
-  }, [url, option, startDate, endDate, onSearch]);
+  }, [url, option, startDate, endDate, onSearch, ts]);
 
   const inputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
@@ -281,6 +281,21 @@ export default function Page() {
   const [rows, setRows] = useState<RowItem[]>([]);
   const [loading, setLoading] = useState(false);
   const { toastShow: ts } = useToast();
+  
+  const lastQueryRef = useRef<string>("");
+
+  const normalizeChannelInput = (input: string) => input.trim().toLowerCase();
+
+  const makeQueryKey = (params: { input: string; start: Date; end: Date; option: string }) => {
+    const { input, start, end, option } = params;
+
+    return [
+      normalizeChannelInput(input),
+      start.getTime(),
+      end.getTime(),
+      option
+    ].join("|");
+  };
 
   const stats = useMemo<ReportStats>(() => {
     const total = rows.length;
@@ -311,7 +326,20 @@ export default function Page() {
     end: Date;
     option: string
   }) => {
+    const currentKey = makeQueryKey({ input, start, end, option });
+    if (currentKey === lastQueryRef.current) {
+      ts({
+        type: 'info',
+        title: '이미 검색한 결과',
+        message: '동일한 조건으로는 중복 검색을 지원하지 않습니다. (일일 호출 제한 적용)',
+        duration: 8000,
+      });
+      return;
+    }
+    lastQueryRef.current = currentKey;
+
     setLoading(true);
+
     try {
       // 1) 채널 ID 조회
       const resolveQs = new URLSearchParams({ input }).toString();
