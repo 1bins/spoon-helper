@@ -401,6 +401,12 @@ export default function Page() {
         return true; // 'all'
       });
 
+      ts({
+        type: 'success',
+        title: '검색 완료',
+        message: '검색이 완료되었습니다 :)'
+      });
+
       setRows(
         filtered.map(v => ({
           videoId: v.videoId,
@@ -445,8 +451,8 @@ export default function Page() {
 
           case 500:
             ts({
-              title: '서버 통신 오류(API)',
-              message: '서버 오류가 발생했습니다. 담당자에게 연락 바랍니다.',
+              title: '채널 오류',
+              message: '해당 채널은 업로드된 영상이 없습니다',
               duration: 5000,
             });
             break;
