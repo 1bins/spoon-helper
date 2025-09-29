@@ -6,7 +6,9 @@ export const menu = [
     id: 1,
     icon: <FaYoutube size={18} />,
     name: '유튜브 조회수 검색',
-    url: 'youtube'
+    url: 'youtube',
+    description: '각 영상의 썸네일·조회수·좋아요·댓글 수 등의 정보를 확인할 수 있습니다.',
+    launched: true,
   },
   {
     id: 2,

@@ -1,0 +1,90 @@
+@use '@/assets/scss/variable' as v;
+
+.container {
+  gap: 1.5rem;
+
+  .item {
+    padding: 0;
+    background: none;
+    border-radius: 0;
+
+    .menu-link {
+      width: 28rem;
+      height: 19.3rem;
+      padding: 2.2rem 2.1rem 2.4rem;
+      background: #FFF;
+      border-radius: 1.2rem;
+
+      &:hover {
+        .icon-box {
+          transform: translateY(-0.5rem);
+          border-radius: 3rem;
+        }
+      }
+    }
+
+    .icon-box {
+      display: flex;
+      width: 6rem;
+      aspect-ratio: 1 / 1;
+      background: #F6F6F6;
+      border-radius: 1.2rem;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+
+      svg {
+        width: 2.7rem;
+        height: 2.7rem;
+      }
+    }
+
+    .content-box {
+      .title {
+        margin: 2.2rem 0 1rem;
+        font-size: 1.8rem;
+        font-weight: 700;
+
+        .launched {
+          display: inline-block;
+          padding: 0.3rem 0.5rem;
+          margin-left: 0.4rem;
+          font-size: 1.1rem;
+          color: v.$color-primary;
+          font-weight: 400;
+          border: 0.1rem solid;
+          vertical-align: 0.2rem;
+          border-radius: 1rem;
+        }
+      }
+
+      .description {
+        color: #999;
+        line-height: 1.2;
+      }
+    }
+
+    // icon 색상
+    &.youtube {
+      svg {
+        fill: red;
+      }
+    }
+
+    // 추후 개발 기능
+    &.none {
+      .mail-link {
+        padding: 1.2rem 1.7rem;
+        color: #2A6F28;
+        background: #DDEBDC;
+        border-radius: 1.2rem;
+
+        .message {
+          display: flex;
+          align-items: center;
+          gap: 0 0.8rem;
+        }
+      }
+    }
+  }
+}
