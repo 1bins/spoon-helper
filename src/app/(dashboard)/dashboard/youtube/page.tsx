@@ -13,10 +13,12 @@ import { addMonths, endOfDay, min, startOfDay } from "date-fns";
 import Link from "next/link";
 import { useCallback, useMemo, useRef, useState } from "react";
 import styles from './youtube.module.scss';
+import { RiFileExcel2Fill } from "react-icons/ri";
+import { downloadXLSXWithThumb } from "@/lib/youtube/download-excel";
 
 const cx = classnames.bind(styles);
 
-type RowItem = {
+export type RowItem = {
   videoId: string;
   title: string;
   url: string;
@@ -28,7 +30,7 @@ type RowItem = {
   isShort: boolean;
 };
 
-type ReportStats = {
+export type ReportStats = {
   totalVideos: number;
   sumViews: number;
   sumLikes: number;
@@ -228,17 +230,50 @@ const TableField = ({ rows }: { rows: RowItem[] }) => {
   );
 };
 
-const TableReport = ({ stats }: { stats: ReportStats }) => {
+const TableReport = ({ stats, rows }: { stats: ReportStats, rows: RowItem[] }) => {
+  const { toastShow: ts } = useToast();
+  const [downLoad, setDownLoad] = useState<boolean>(false);
   const { numFmt, numFmtPoint } = useKRFmt();
   const {
       totalVideos, sumViews, sumLikes, sumComments,
       avgViews, avgLikes, avgComments
   } = stats;
 
+  const handleExcelDownload = async() => {
+    setDownLoad(true);
+    ts({
+      type: 'info',
+      title: '엑셀 다운로드 중',
+      message: '영상 데이터를 엑셀 파일로 추출하고 있습니다'
+    });
+
+    try {
+      await downloadXLSXWithThumb(rows, stats);
+      ts({
+        type: 'success',
+        title: '엑셀 다운로드 완료',
+        message: '다운로드가 정상적으로 완료되었습니다',
+      });
+    } catch (error) {
+      ts({
+        type: 'warn',
+        title: '엑셀 다운로드 오류',
+        message: '다운로드 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.',
+      });
+    } finally {
+      setDownLoad(false);
+    }
+  }
+
   return(
     <Card className={cx('report-wrp')}>
       <div className={cx('title-box')}>
         <p>종합 결과 리포트</p>
+        <Button
+          icon={<RiFileExcel2Fill size={16}/>}
+          disabled={downLoad || !totalVideos}
+          onClick={handleExcelDownload}
+        />
       </div>
       <div className={cx('list-box')}>
         <dl className={cx('--mb')}>
@@ -479,7 +514,7 @@ export default function Page() {
           {loading && <Loader />}
           {!loading && <TableField rows={rows} />}
         </Card>
-        {!loading && <TableReport stats={stats} />}
+        {!loading && <TableReport stats={stats} rows={rows} />}
       </Card>
     </Box>
   );
