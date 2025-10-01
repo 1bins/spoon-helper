@@ -29,8 +29,10 @@ const MainItem = ({
     return (
       <Card className={cx('item', 'none')}>
         <Link
-          href={'mailto: wonbinseo@spoond.co.kr'}
+          href={'https://docs.google.com/spreadsheets/d/1X8LMnAvadPQR-xWzrKbw5AG9-jMSs2Yzj2y4leq3GLs/edit?usp=sharing'}
           className={cx('mail-link')}
+          target={'_blank'}
+          title={'새 탭으로 열기'}
         >
           <p className={cx('message')}><IoMdMail size={18} fill={'#2A6F28'}/> 추가 개발 요청하기</p>
         </Link>
