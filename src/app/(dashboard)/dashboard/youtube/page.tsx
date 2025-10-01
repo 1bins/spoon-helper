@@ -273,6 +273,7 @@ const TableReport = ({ stats, rows }: { stats: ReportStats, rows: RowItem[] }) =
           icon={<RiFileExcel2Fill size={16}/>}
           disabled={downLoad || !totalVideos}
           onClick={handleExcelDownload}
+          title={"엑셀 다운로드"}
         />
       </div>
       <div className={cx('list-box')}>
