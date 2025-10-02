@@ -244,15 +244,16 @@ const TableReport = ({ stats, rows }: { stats: ReportStats, rows: RowItem[] }) =
     ts({
       type: 'info',
       title: '엑셀 다운로드 중',
-      message: '영상 데이터를 엑셀 파일로 추출하고 있습니다'
+      message: '영상 데이터를 엑셀 파일로 변환하고 있습니다. 잠시만 기다려주세요.',
+      duration: 8000,
     });
 
     try {
       await downloadXLSXWithThumb(rows, stats);
       ts({
         type: 'success',
-        title: '엑셀 다운로드 완료',
-        message: '다운로드가 정상적으로 완료되었습니다',
+        title: '엑셀 변환 완료',
+        message: '변환이 정상적으로 완료되었습니다. 다운로드가 곧 시작됩니다.',
       });
     } catch (error) {
       ts({
