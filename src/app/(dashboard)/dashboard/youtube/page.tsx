@@ -11,10 +11,12 @@ import { useToast } from '@/components/ui/Toast/useToast';
 import classnames from 'classnames/bind';
 import { addMonths, endOfDay, min, startOfDay } from "date-fns";
 import Link from "next/link";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import styles from './youtube.module.scss';
 import { RiFileExcel2Fill } from "react-icons/ri";
 import { downloadXLSXWithThumb } from "@/lib/youtube/download-excel";
+import { SortSelect } from "@/app/(dashboard)/dashboard/youtube/components/SortSelect";
+import { SortState } from "@/types/sort";
 
 const cx = classnames.bind(styles);
 
@@ -159,7 +161,7 @@ const FormField = ({ onSearch, loading }: { onSearch: (params: { input: string; 
   );
 };
 
-/** ── TableItem (rows 1개씩) ─────────────────────────── */
+/** ── TableItem ─────────────────────────── */
 const TableItem = ({ row, index }: { row: RowItem; index: number }) => {
   const { dateFmt, timeFmt, numFmt } = useKRFmt();
 
@@ -230,6 +232,7 @@ const TableField = ({ rows }: { rows: RowItem[] }) => {
   );
 };
 
+/** ── TableReport ─────────────────────────── */
 const TableReport = ({ stats, rows }: { stats: ReportStats, rows: RowItem[] }) => {
   const { toastShow: ts } = useToast();
   const [downLoad, setDownLoad] = useState<boolean>(false);
@@ -316,7 +319,13 @@ const TableReport = ({ stats, rows }: { stats: ReportStats, rows: RowItem[] }) =
 /** ── Page (실제 API 호출 붙이기) ─────────────────────────── */
 export default function Page() {
   const [rows, setRows] = useState<RowItem[]>([]);
+  const [sortRows, setSortRows] = useState<RowItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const [sort, setSort] = useState<SortState>({
+    key: 'publishedAt',
+    dir: 'desc',
+  });
+
   const { toastShow: ts } = useToast();
   
   const lastQueryRef = useRef<string>("");
@@ -508,13 +517,52 @@ export default function Page() {
     }
   };
 
+  useEffect(() => {
+    if (!rows.length) return;
+
+    const sorted = [...rows].sort((a: RowItem, b: RowItem) => {
+      switch (sort.key) {
+        case 'viewCount':
+          return sort.dir === 'asc'
+            ? a.viewCount - b.viewCount
+            : b.viewCount - a.viewCount;
+
+        case 'likeCount':
+          return sort.dir === 'asc'
+            ? a.likeCount - b.likeCount
+            : b.likeCount - a.likeCount;
+
+        case 'commentCount':
+          return sort.dir === 'asc'
+            ? a.commentCount - b.commentCount
+            : b.commentCount - a.commentCount;
+
+        case 'title':
+          return sort.dir === 'asc'
+            ? a.title.localeCompare(b.title, 'ko')
+            : b.title.localeCompare(a.title, 'ko');
+
+        case 'publishedAt':
+          return sort.dir === 'asc'
+            ? new Date(a.publishedAt).getTime() - new Date(b.publishedAt).getTime()
+            : new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+
+        default:
+          return 0;
+      }
+    });
+
+    setSortRows(sorted);
+  }, [sort, rows]);
+
   return (
     <Box title="유튜브 채널 검색" className={cx('container')}>
       <FormField onSearch={handleSearch} loading={loading} />
+      {rows.length > 1 && <SortSelect sort={sort} onChange={setSort} />}
       <Card className={cx('flex-box')} flexDirection={"row"}>
         <Card className={cx('table-box')}>
           {loading && <Loader />}
-          {!loading && <TableField rows={rows} />}
+          {!loading && <TableField rows={sortRows} />}
         </Card>
         {!loading && <TableReport stats={stats} rows={rows} />}
       </Card>
