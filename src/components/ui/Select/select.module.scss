@@ -31,4 +31,9 @@
       }
     }
   }
+
+  // disabled
+  &.disabled {
+    opacity: .6;
+  }
 }

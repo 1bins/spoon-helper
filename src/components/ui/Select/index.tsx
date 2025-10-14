@@ -1,10 +1,11 @@
 'use client';
 
-import styles from './select.module.scss';
-import classnames from 'classnames/bind';
 import Button from "@/components/ui/Button";
-import {useEffect, useRef, useState} from "react";
+import classnames from 'classnames/bind';
+import { useEffect, useRef, useState } from "react";
 import { IoMdArrowDropdownCircle } from "react-icons/io";
+import { useToast } from '../Toast/useToast';
+import styles from './select.module.scss';
 
 const cx =  classnames.bind(styles);
 
@@ -14,6 +15,7 @@ interface SelectProps {
   options: OptionItem[];
   placeholder?: string;
   className?: string;
+  disabled?: boolean;
   // Controlled
   value: string;
   onChange: (value: string) => void;
@@ -23,6 +25,7 @@ const Select = ({
   options,
   placeholder,
   className,
+  disabled = false,
   value,
   onChange
 }: SelectProps) => {
@@ -32,6 +35,7 @@ const Select = ({
   const wrapperRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
   const btnRef = useRef<HTMLButtonElement>(null);
+  const { toastShow: ts } = useToast();
 
   // 바깥 클릭 닫기
   useEffect(() => {
@@ -43,6 +47,19 @@ const Select = ({
     document.addEventListener('click', onDocClick);
     return () => document.removeEventListener('click', onDocClick);
   }, [isOpen])
+
+  // 비활성화 시
+  const handleSelectBox = () => {
+    if (disabled) {
+      ts({
+        type: 'warn',
+        title: '정렬 기능 오류',
+        message: '채널 검색을 먼저 진행해주세요'
+      })
+    } else {
+      setIsOpen(!isOpen)
+    }
+  }
 
   // 옵션 선택시
   const handleClickOption = (value: string) => {
@@ -56,7 +73,7 @@ const Select = ({
       <div className={cx('container')}>
         <Button
           className={cx('select')}
-          onClick={() => alert('데이터가 없습니다.')} // TODO:: toast
+          onClick={() => alert('데이터가 없습니다.')}
         >
           <span className={cx('placeholder')}>데이터 없음</span>
         </Button>
@@ -67,12 +84,12 @@ const Select = ({
   return(
     <div
       ref={wrapperRef}
-      className={cx('container', className)}
+      className={cx('container', className, disabled && 'disabled')}
     >
       <Button
         ref={btnRef}
         className={cx('select')}
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={handleSelectBox}
         icon={<IoMdArrowDropdownCircle size={17} />}
         active={isOpen}
       >
