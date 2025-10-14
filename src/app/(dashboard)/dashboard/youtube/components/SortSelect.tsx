@@ -1,21 +1,22 @@
-import { useState } from "react";
 import Card from "@/components/ui/Card";
-import styles from './SortSelect.module.scss';
 import Select from "@/components/ui/Select";
-import classnames from "classnames/bind";
 import { SortDir, SortKey, SortState } from "@/types/sort";
+import classnames from "classnames/bind";
+import styles from './SortSelect.module.scss';
 
 const cx = classnames.bind(styles);
 
 interface SortSelectProps {
   sort: SortState;
   onChange: (next: SortState) => void;
+  disabled?: boolean;
 }
 
 export const SortSelect = (
 {
   sort,
   onChange,
+  disabled,
 }: SortSelectProps) => {
 
   const sortOptions = [
@@ -47,6 +48,7 @@ export const SortSelect = (
         value={`${sort.key}:${sort.dir}`}
         placeholder={'업로드 날짜 최신순'}
         onChange={handleSortChange}
+        disabled={disabled}
       />
     </Card>
   )
