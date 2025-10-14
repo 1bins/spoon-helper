@@ -1,5 +1,6 @@
 'use client';
 
+import { SortSelect } from "@/app/(dashboard)/dashboard/youtube/components/SortSelect";
 import Box from "@/components/ui/Box";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
@@ -8,15 +9,13 @@ import Input from "@/components/ui/Input";
 import Loader from "@/components/ui/Loader";
 import Select from "@/components/ui/Select";
 import { useToast } from '@/components/ui/Toast/useToast';
+import { downloadXLSXWithThumb } from "@/lib/youtube/download-excel";
+import { SortState } from "@/types/sort";
 import classnames from 'classnames/bind';
 import { addMonths, endOfDay, min, startOfDay } from "date-fns";
-import Link from "next/link";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import styles from './youtube.module.scss';
+import { useCallback, useMemo, useRef, useState } from "react";
 import { RiFileExcel2Fill } from "react-icons/ri";
-import { downloadXLSXWithThumb } from "@/lib/youtube/download-excel";
-import { SortSelect } from "@/app/(dashboard)/dashboard/youtube/components/SortSelect";
-import { SortState } from "@/types/sort";
+import styles from './youtube.module.scss';
 
 const cx = classnames.bind(styles);
 
@@ -115,11 +114,25 @@ const FormField = ({ onSearch, loading }: { onSearch: (params: { input: string; 
   }
 
   const handleStartDate = (date: Date | null) => {
-    setStartDate(date ? startOfDay(date) : null);   // 00:00:00
+    if (loading) {
+      ts({
+        type: 'warn',
+        message: '검색 중에는 입력값 변경이 불가능합니다'
+      })
+      return;
+    }
+    setStartDate(date ? startOfDay(date) : null);
   };
 
   const handleEndDate = (date: Date | null) => {
-    setEndDate(date ? endOfDay(date) : null);       // 23:59:59.999
+    if (loading) {
+      ts({
+        type: 'warn',
+        message: '검색 중에는 입력값 변경이 불가능합니다'
+      })
+      return;
+    }
+    setEndDate(date ? endOfDay(date) : null);
   };
 
   return (
@@ -184,9 +197,9 @@ const TableItem = ({ row, index }: { row: RowItem; index: number }) => {
         </p>
       </td>
       <td>
-        <Link href={row.url} target="_blank" className={cx('title')}>
+        <a href={row.url} target="_blank" className={cx('title')} rel="noopener noreferrer">
           {row.title}
-        </Link>
+        </a>
       </td>
       <td>
         <p className={cx('date')}>
@@ -319,7 +332,6 @@ const TableReport = ({ stats, rows }: { stats: ReportStats, rows: RowItem[] }) =
 /** ── Page (실제 API 호출 붙이기) ─────────────────────────── */
 export default function Page() {
   const [rows, setRows] = useState<RowItem[]>([]);
-  const [sortRows, setSortRows] = useState<RowItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [sort, setSort] = useState<SortState>({
     key: 'publishedAt',
@@ -327,7 +339,7 @@ export default function Page() {
   });
 
   const { toastShow: ts } = useToast();
-  
+
   const lastQueryRef = useRef<string>("");
 
   const normalizeChannelInput = (input: string) => input.trim().toLowerCase();
@@ -517,52 +529,45 @@ export default function Page() {
     }
   };
 
-  useEffect(() => {
-    if (!rows.length) return;
+  const sortedRows = useMemo(() => {
+    if (!rows.length) return [];
 
-    const sorted = [...rows].sort((a: RowItem, b: RowItem) => {
+    return [...rows].sort((a, b) => {
       switch (sort.key) {
         case 'viewCount':
           return sort.dir === 'asc'
             ? a.viewCount - b.viewCount
             : b.viewCount - a.viewCount;
-
         case 'likeCount':
           return sort.dir === 'asc'
             ? a.likeCount - b.likeCount
             : b.likeCount - a.likeCount;
-
         case 'commentCount':
           return sort.dir === 'asc'
             ? a.commentCount - b.commentCount
             : b.commentCount - a.commentCount;
-
         case 'title':
           return sort.dir === 'asc'
             ? a.title.localeCompare(b.title, 'ko')
             : b.title.localeCompare(a.title, 'ko');
-
         case 'publishedAt':
           return sort.dir === 'asc'
-            ? new Date(a.publishedAt).getTime() - new Date(b.publishedAt).getTime()
-            : new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
-
+            ? +new Date(a.publishedAt) - +new Date(b.publishedAt)
+            : +new Date(b.publishedAt) - +new Date(a.publishedAt);
         default:
           return 0;
       }
     });
-
-    setSortRows(sorted);
-  }, [sort, rows]);
+  }, [rows, sort]);
 
   return (
     <Box title="유튜브 채널 검색" className={cx('container')}>
       <FormField onSearch={handleSearch} loading={loading} />
-      {rows.length > 1 && <SortSelect sort={sort} onChange={setSort} />}
+      <SortSelect sort={sort} onChange={setSort} disabled={sortedRows.length < 1} />
       <Card className={cx('flex-box')} flexDirection={"row"}>
         <Card className={cx('table-box')}>
           {loading && <Loader />}
-          {!loading && <TableField rows={sortRows} />}
+          {!loading && <TableField rows={sortedRows} />}
         </Card>
         {!loading && <TableReport stats={stats} rows={rows} />}
       </Card>
