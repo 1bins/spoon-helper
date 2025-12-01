@@ -1,6 +1,19 @@
+@use '@/assets/scss/variable' as v;
+
 .container {
   position: relative;
   width: 26.3rem;
+
+  .label {
+    display: block;
+    margin-bottom: 0.8rem;
+    font-size: 1.5rem;
+
+    &-essential {
+      padding-left: 0.2rem;
+      color: v.$color-primary;
+    }
+  }
 
   button {
     width: 100%;

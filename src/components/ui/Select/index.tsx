@@ -17,6 +17,8 @@ interface SelectProps {
   className?: string;
   disabled?: boolean;
   // Controlled
+  label?: string;
+  labelEssential?: boolean;
   value: string;
   onChange: (value: string) => void;
 }
@@ -26,6 +28,8 @@ const Select = ({
   placeholder,
   className,
   disabled = false,
+  label,
+  labelEssential = false,
   value,
   onChange
 }: SelectProps) => {
@@ -86,6 +90,13 @@ const Select = ({
       ref={wrapperRef}
       className={cx('container', className, disabled && 'disabled')}
     >
+      {
+        label &&
+        <p className={cx('label')}>
+          {label}
+          {labelEssential && <span className={cx('label-essential')}>*</span>}
+        </p>
+      }
       <Button
         ref={btnRef}
         className={cx('select')}
