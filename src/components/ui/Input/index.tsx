@@ -11,6 +11,7 @@ type NativeInputProps = React.InputHTMLAttributes<HTMLInputElement>;
 export interface InputProps extends Omit<NativeInputProps, 'type' | 'onChange'> {
   type?: 'text' | 'password' | 'number';
   label?: string;
+  labelEssential?: boolean;
   onChange?: (value: string) => void;
 }
 
@@ -19,6 +20,8 @@ const Input = ({
   id,
   value,
   name,
+  label,
+  labelEssential = false,
   placeholder,
   className,
   onChange,
@@ -29,21 +32,26 @@ const Input = ({
   const inputId = useId();
 
   return(
-    <input
-      type={type}
-      id={id || inputId}
-      value={value}
-      name={name}
-      placeholder={placeholder}
-      className={cx(
-        'input',
-        className,
-      )}
-      onChange={(e) => onChange?.(e.target.value)}
-      onKeyDown={onKeyDown}
-      disabled={disabled}
-      {...rest}
-    />
+    <>
+      {label && <label htmlFor={inputId} className={cx('label')}>
+        {label}{labelEssential && <span className={cx('label-essential')}>*</span>}
+      </label>}
+      <input
+        type={type}
+        id={id || inputId}
+        value={value}
+        name={name}
+        placeholder={placeholder}
+        className={cx(
+          'input',
+          className,
+        )}
+        onChange={(e) => onChange?.(e.target.value)}
+        onKeyDown={onKeyDown}
+        disabled={disabled}
+        {...rest}
+      />
+    </>
   )
 }
 
