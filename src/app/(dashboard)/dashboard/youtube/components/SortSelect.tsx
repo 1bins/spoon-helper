@@ -49,6 +49,7 @@ export const SortSelect = (
         placeholder={'업로드 날짜 최신순'}
         onChange={handleSortChange}
         disabled={disabled}
+        errMessage={'채널 검색을 먼저 진행해주세요'}
       />
     </Card>
   )
