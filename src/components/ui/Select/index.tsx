@@ -21,6 +21,8 @@ interface SelectProps {
   labelEssential?: boolean;
   value: string;
   onChange: (value: string) => void;
+  errTitle?: string;
+  errMessage?: string;
 }
 
 const Select = ({
@@ -31,7 +33,9 @@ const Select = ({
   label,
   labelEssential = false,
   value,
-  onChange
+  onChange,
+  errTitle,
+  errMessage
 }: SelectProps) => {
   const [isOpen, setIsOpen] = useState(false);
   // const isControlled = value !== undefined && onChange !== undefined; // true면 부모에서 상태 관리
@@ -57,8 +61,8 @@ const Select = ({
     if (disabled) {
       ts({
         type: 'warn',
-        title: '정렬 기능 오류',
-        message: '채널 검색을 먼저 진행해주세요'
+        title: errTitle ?? 'OOPS! 😒',
+        message: errMessage ?? ''
       })
     } else {
       setIsOpen(!isOpen)
